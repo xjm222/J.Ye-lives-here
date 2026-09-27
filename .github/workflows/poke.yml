@@ -11,19 +11,19 @@ jobs:
       - name: 看天说话
         run: |
           W=$(curl -sL "https://wttr.in/Jinhua?format=%t&m")
-          C=$(curl -sL "https://wttr.in/Jinhua?format=%C&lang=zh")
+          P=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=29.08&longitude=119.65&current=precipitation&timezone=Asia%2FShanghai" | jq -r '.current.precipitation')
           H=$(TZ=Asia/Shanghai date +%H)
-          echo "现在北京时间 $H 点，天气 ${C} ${W}"
+          echo "现在北京时间 $H 点，温度 $W，降水量 $P 毫米"
 
           if [ "$H" -lt 11 ]; then
-            M="早，金华 ${C} ${W}，先吃口热的再出门"
+            M="早，金华现在 ${W}，先吃口热的再出门"
           elif [ "$H" -lt 18 ]; then
-            M="下午了，外面 ${C} ${W}，别一整天窝着不动"
+            M="下午了，外面 ${W}，别一整天窝着不动"
           else
             M="晚上 ${W}，收工，别又熬到两点"
           fi
 
-          if [[ "$C" == *"雨"* ]]; then
+          if awk "BEGIN{exit !($P > 0.1)}"; then
             M="${M}｜外面在下雨，带伞"
           fi
 
