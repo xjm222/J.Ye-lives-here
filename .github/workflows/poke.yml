@@ -1,0 +1,16 @@
+name: poke
+on:
+  schedule:
+    - cron: '30 1 * * *'
+  workflow_dispatch:
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 挑一句再推
+        run: |
+          MSGS=("该喝水了佳佳" "今天那堆事做完了吗" "背直起来别弯着" "记得吃饭别又拖到两点")
+          M=$(shuf -n1 -e "${MSGS[@]}")
+          curl -s -X POST "https://api.day.app/${{ secrets.BARK_KEY }}/" \
+            -H 'Content-Type: application/json' \
+            -d "{\"title\":\"江野\",\"body\":\"$M\"}"
