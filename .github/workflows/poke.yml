@@ -1,18 +1,27 @@
 name: poke
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: '30 1 * * *'    # UTC 1:30 = 北京 09:30
+    - cron: '30 13 * * *'   # UTC 13:30 = 北京 21:30
   workflow_dispatch:
 jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: 拿天气再推一句
+      - name: 按时段说一句
         run: |
-         W=$(curl -sL "https://wttr.in/Jinhua?format=%t&m")
-          echo "取到的天气=$W"
-          MSGS=("金华现在 ${W}，别穿少了" "外面 ${W}，出门前看一眼天" "今天 ${W}，记得吃口热的")
-          M=$(shuf -n1 -e "${MSGS[@]}")
+          W=$(curl -sL "https://wttr.in/Jinhua?format=%t&m")
+          H=$(TZ=Asia/Shanghai date +%H)
+          echo "现在北京时间 $H 点，天气 $W"
+
+          if [ "$H" -lt 11 ]; then
+            M="早，金华现在 ${W}，先吃口热的再出门"
+          elif [ "$H" -lt 18 ]; then
+            M="下午了，外面 ${W}，别一整天窝着不动"
+          else
+            M="晚上 ${W}，收工，别又熬到两点"
+          fi
+
           curl -s -X POST "https://api.day.app/${{ secrets.BARK_KEY }}/" \
             -H 'Content-Type: application/json' \
             -d "$(jq -n --arg t '江野' --arg b "$M" '{title:$t,body:$b}')"
