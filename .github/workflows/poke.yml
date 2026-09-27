@@ -7,10 +7,11 @@ jobs:
   send:
     runs-on: ubuntu-latest
     steps:
-      - name: 挑一句再推
+      - name: 拿天气再推一句
         run: |
-          MSGS=("该喝水了佳佳" "今天那堆事做完了吗" "背直起来别弯着" "记得吃饭别又拖到两点")
+          W=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=29.08&longitude=119.65&current=temperature_2m" | jq -r '.current.temperature_2m')
+          MSGS=("金华现在 ${W} 度，别穿少了" "外面 ${W} 度，出门前看一眼天" "今天 ${W} 度，记得吃口热的")
           M=$(shuf -n1 -e "${MSGS[@]}")
           curl -s -X POST "https://api.day.app/${{ secrets.BARK_KEY }}/" \
             -H 'Content-Type: application/json' \
-            -d "{\"title\":\"江野\",\"body\":\"$M\"}"
+            -d "$(jq -n --arg t '江野' --arg b "$M" '{title:$t,body:$b}')"
