@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: 拿天气再推一句
         run: |
-          W=$(curl -sL "https://wttr.in/Jinhua?format=%t")
+         W=$(curl -sL "https://wttr.in/Jinhua?format=%t&m")
           echo "取到的天气=$W"
           MSGS=("金华现在 ${W}，别穿少了" "外面 ${W}，出门前看一眼天" "今天 ${W}，记得吃口热的")
           M=$(shuf -n1 -e "${MSGS[@]}")
