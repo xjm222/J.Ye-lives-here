@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: 拿天气再推一句
         run: |
-          W=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=29.08&longitude=119.65&current=temperature_2m" | jq -r '.current.temperature_2m')
+          W=$(curl -s "https://api.open-meteo.com/v1/forecast?latitude=29.08&longitude=119.65&current=temperature_2m" | jq -r '.current.temperature_2m')&timezone=Asia/Shanghai
           MSGS=("金华现在 ${W} 度，别穿少了" "外面 ${W} 度，出门前看一眼天" "今天 ${W} 度，记得吃口热的")
           M=$(shuf -n1 -e "${MSGS[@]}")
           curl -s -X POST "https://api.day.app/${{ secrets.BARK_KEY }}/" \
